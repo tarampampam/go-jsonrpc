@@ -11,7 +11,11 @@
 [![Go Report][badge_goreport]][link_goreport]
 [![License][badge_license]][link_license]
 
-WIP
+This package provides JsonRPC 2.0 implementation based on interfaces with easy components extending.
+
+<p align="center">
+    <a href="https://asciinema.org/a/327835" target="_blank"><img src="https://asciinema.org/a/327835.svg" width="900"></a>
+</p>
 
 ## Installation and usage
 
@@ -19,7 +23,7 @@ The import path for the package is `github.com/tarampampam/go-jsonrpc`.
 
 To install it, run:
 
-```bash
+```shell script
 go get github.com/tarampampam/go-jsonrpc
 ```
 
@@ -27,7 +31,91 @@ go get github.com/tarampampam/go-jsonrpc
 
 ### Usage example
 
-WIP
+Working examples can be found [in `examples` directory](./examples).
+
+RPC methods definition is very simple:
+
+```go
+package main
+
+import "github.com/tarampampam/go-jsonrpc"
+
+type myRpcMethod struct{} // Implements `jsonrpc.Method` interface
+
+// GetParamsType says to Router a structure (or nil) which must be used for params parsing (fields, etc.).
+func (*myRpcMethod) GetParamsType() interface{} { return nil }
+
+// GetName returns method name in string representation.
+func (*myRpcMethod) GetName() string { return "my.method" }
+
+// Handle will be called by Router when method with current name will be requested.
+func (*myRpcMethod) Handle(_ interface{}) (interface{}, jsonrpc.Error) {
+	return "your method response", nil
+}
+```
+
+You can define method params as a structure too:
+
+```go
+package main
+
+import "errors"
+
+type (
+    myRpcMethod struct{} // Implements `jsonrpc.Method` interface
+
+    myRpcMethodParams struct { // Implements `jsonrpc.Validator` interface
+        Number     int     `json:"number"`
+        IsOptional *string `json:"is_optional"` // optional value (can be nil)
+    }
+)
+
+// Implement `jsonrpc.Validator` interface for easy incoming params validation
+func (p *myRpcMethodParams) Validate() error {
+	if p.Number <= 0 {
+		return errors.New("number must be positive")
+	}
+
+	return nil // all is ok
+}
+
+// GetParamsType NOW returns structure for method params
+func (*myRpcMethod) GetParamsType() interface{} { return &myRpcMethodParams{} }
+
+// ...
+```
+
+And use use provided kernel and router:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/tarampampam/go-jsonrpc"
+	rpcKernel "github.com/tarampampam/go-jsonrpc/kernel"
+	rpcRouter "github.com/tarampampam/go-jsonrpc/router"
+)
+
+// ... methods and params definitions ...
+
+func main () {
+    // create router instance
+	router := rpcRouter.New()
+
+    // register our RPC method
+    router.RegisterMethod(new(myRpcMethod))
+
+    // create kernel using our router
+    kernel := rpcKernel.New(router)
+
+    // handle RPC request
+    responseAsJSON := kernel.HandleJSONRequest([]byte(`{"jsonrpc":"2.0", "method":"ping", "id":1}`))
+
+    fmt.Println(responseAsJSON)
+}
+```
 
 ### Testing
 
