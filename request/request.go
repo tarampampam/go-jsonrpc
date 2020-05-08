@@ -14,7 +14,7 @@ type Request struct {
 	ID      interface{} `json:"id"`               // optional for notifications only, string|int
 }
 
-// IsValid makes request validation (request is correct and can be processed?).
+// Validate makes request validation (request is correct and can be processed?).
 func (request *Request) Validate() error {
 	if request.Version != jsonrpc.Version {
 		return errors.New("wrong version")

@@ -9,6 +9,7 @@ import (
 	rpcErrors "github.com/tarampampam/go-jsonrpc/errors"
 )
 
+// Router is default RPC router implementation.
 type Router struct {
 	mutex   sync.RWMutex
 	methods map[string]jsonrpc.Method

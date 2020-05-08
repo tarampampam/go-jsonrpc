@@ -1,4 +1,3 @@
-// Docs: <https://www.jsonrpc.org/specification#error_object>
 package errors
 
 import (
@@ -9,14 +8,14 @@ import (
 type Code int
 
 const (
-	Parse          Code = -32700
-	InvalidRequest Code = -32600
-	MethodNotFound Code = -32601
-	InvalidParams  Code = -32602
-	Internal       Code = -32603
+	Parse          Code = -32700 // Parse error
+	InvalidRequest Code = -32600 // Invalid Request
+	MethodNotFound Code = -32601 // Method not found
+	InvalidParams  Code = -32602 // Invalid params
+	Internal       Code = -32603 // Internal error
 )
 
-// Error is a wrapper for a JSON interface value.
+// Error is a wrapper for a JSON interface value. Docs: <https://www.jsonrpc.org/specification#error_object>
 type Error struct {
 	Code    Code        `json:"code"`
 	Message string      `json:"message"`

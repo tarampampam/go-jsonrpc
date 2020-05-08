@@ -11,8 +11,10 @@ import (
 	rpcResponse "github.com/tarampampam/go-jsonrpc/response"
 )
 
+// ErrorHandler allows to customize errors handling process.
 type ErrorHandler func(err jsonrpc.Error) *rpcErrors.Error
 
+// Kernel is default kernel implementation.
 type Kernel struct {
 	router               jsonrpc.Router
 	json                 jsoniter.API
